@@ -1,20 +1,19 @@
 import os
 
 from random import choice
-
+import tempfile
 
 class DirDict:
 
     def __init__(self,path):
         self.path = path
-        self.cur_path = os.path.join(os.getcwd(),self.path)
+        self.cur_path = os.path.join(tempfile.gettempdir(), self.path)
         os.makedirs(path)
 
     def __getitem__(self, key):
 
         try:
             with open(os.path.join(self.cur_path,key), 'r') as f:
-                os.chdir('..')
                 return f.read()
         except FileNotFoundError:
             raise KeyError
@@ -24,11 +23,11 @@ class DirDict:
 
         with open(key, 'w') as f:
             f.write(str(value))
-        os.chdir('..')
+
 
     def __delitem__(self, key):
         os.remove(os.path.join(self.cur_path,key))
-        os.chdir('..')
+
 
     def __len__(self):
         count = 0
@@ -76,7 +75,7 @@ class DirDict:
         size = 0
         for elem in os.listdir(os.getcwd()):
             size += os.path.getsize(elem)
-        os.chdir('..')
+
         return size
 
     def __str__(self):
@@ -84,13 +83,12 @@ class DirDict:
         for elem in os.listdir(self.cur_path):
             with open(os.path.join(self.cur_path,elem), 'r') as f:
                 dictionary[elem] = f.read()
-        os.chdir('..')
         return str(dictionary)
 
     def clear(self):
         for elem in os.listdir(self.cur_path):
             os.remove(self.cur_path + '/' + elem)
-        os.chdir('..')
+
 
     def copy(self):
 
@@ -115,30 +113,30 @@ class DirDict:
         for elem in os.listdir(self.cur_path):
             with open(os.path.join(self.cur_path,elem), 'r') as f:
                 items.append((elem,f.read()))
-        os.chdir('..')
+
         return items
 
 
     def keys(self):
         keys = os.listdir(self.cur_path)
-        os.chdir('..')
+
         return keys
 
     def pop(self, k, d=None):
         if k in os.listdir(self.cur_path):
             with open(os.path.join(self.cur_path,k),'r') as f:
                 del self[k]
-                os.chdir('..')
+
                 return f.read()
         else:
-            os.chdir('..')
+
             return d
 
     def popitem(self):
         k = choice(os.listdir(self.cur_path))
         with open(os.path.join(self.cur_path,k),'r') as f:
             del self[k]
-            os.chdir('..')
+
             return k, f.read()
 
     def setdefault(self, k, d=''):
@@ -150,7 +148,7 @@ class DirDict:
         else:
             with open(os.path.join(self.cur_path,k),'w') as f:
                 f.write(str(d))
-                os.chdir('..')
+
                 return k, d
 
     def update(self, *args):
@@ -158,7 +156,7 @@ class DirDict:
             for k, v in elem.items():
                 with open(os.path.join(self.cur_path,k), 'w') as f:
                     f.write(v)
-        os.chdir('..')
+
 
     def values(self):
         values = []
@@ -166,7 +164,6 @@ class DirDict:
         for elem in os.listdir(self.cur_path):
             with open(os.path.join(self.cur_path,elem), 'r') as f:
                 values.append(f.read())
-        #os.chdir('..')
         return values
 
 
